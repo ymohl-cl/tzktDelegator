@@ -1,0 +1,74 @@
+version: '3.8'
+services:
+  db:
+    container_name: db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: tzkt
+    ports:
+      - "5432:5432"
+    volumes: 
+      - ./sql/migrations:/docker-entrypoint-initdb.d/
+    networks:
+      - tzkt_shared_network
+
+  api:
+    container_name: tzkt_api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - CMD_NAME=api
+    restart: always
+    ports:
+      - "4242:4242"
+    environment:
+      PGSQL_HOST: db
+      PGSQL_PORT: 5432
+      PGSQL_USER: root
+      PGSQL_PASSWORD: root
+      PGSQL_DATABASE: tzkt
+      HTTP_PORT: 4242
+      HTTP_SSL_ENABLE: false
+      HTTP_SWAGGER_ENABLE: false
+      LOGGER_LEVEL: info
+      LOGGER_ENCODING: console
+    depends_on:
+      - db
+    networks:
+      - tzkt_shared_network
+
+  ingestor:
+    container_name: delegator_ingester
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - CMD_NAME=delegator_ingester
+    restart: always
+    environment:
+      PGSQL_HOST: db
+      PGSQL_PORT: 5432
+      PGSQL_USER: root
+      PGSQL_PASSWORD: root
+      PGSQL_DATABASE: tzkt
+      LOGGER_LEVEL: info
+      LOGGER_ENCODING: console
+      TZKT_HOST: "https://api.tzkt.io/v1/ws"
+    depends_on:
+      - db
+    networks:
+      - tzkt_shared_network
+
+volumes:
+  tzkt_db:
+    driver: local
+    name: tzkt_db
+
+networks:
+  tzkt_shared_network:
+    driver: bridge
+    name: tzkt_shared_network
