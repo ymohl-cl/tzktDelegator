@@ -33,7 +33,6 @@ Run `make build` to build the project (all command). You can also build individu
 Here are some suggestions for improving TZKT Delegator:
 
 * Complete unit tests for all packages
-* Add a service to ingest historical data with the TzKT API
 * Add pagination to the xtz/delegations request
 * /!\ Record the reorgs with timestamps to avoid to ingest the older data reorganized in a multi instance environment
 * /!\ Check if reorgs exist for the current new data entry (reorg stategy in multi instance environment)
@@ -46,6 +45,7 @@ Here are some suggestions for improving TZKT Delegator:
 
 The project has the following folder structure:
 
+``` text
 ├── cmd
 │   ├── api
 │   │   └── main.go
@@ -66,6 +66,7 @@ The project has the following folder structure:
 │   └── queries.sql
 ├── License
 └── sqlc.yaml
+```
 
 ## License
 
